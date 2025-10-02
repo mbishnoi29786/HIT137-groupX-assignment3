@@ -1,0 +1,23 @@
+# Core ML and AI Dependencies
+transformers>=4.30.0
+torch>=2.0.0
+torchvision>=0.15.0
+diffusers>=0.20.0
+huggingface-hub>=0.15.0
+
+# Image Processing
+pillow>=9.0.0
+
+# Audio Processing (for speech-to-text without ffmpeg)
+librosa>=0.9.0
+soundfile>=0.12.0
+
+# Audio Playback (for preview functionality)
+pygame>=2.5.0
+
+# Utility Libraries
+requests>=2.25.0
+numpy>=1.21.0
+
+# Optional but recommended for faster inference
+accelerate>=0.20.0
