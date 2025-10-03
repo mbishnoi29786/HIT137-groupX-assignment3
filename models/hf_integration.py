@@ -7,10 +7,29 @@ advanced OOP concepts while providing a clean interface for model usage.
 Demonstrates: Multiple inheritance, encapsulation, polymorphism, method overriding
 """
 
+import logging
 import os
+import platform
 import tempfile
 from typing import Dict, Any, List, Union
 from PIL import Image
+
+# macOS Accelerate can mis-handle multi-threaded BLAS calls on ARM and raise
+# EXC_BAD_ACCESS (SIGBUS) when PyTorch spins up several workers. Constrain the
+# Apple BLAS/OpenMP thread pools before importing torch so we stay on a single
+# thread per process.
+if platform.system() == "Darwin":
+    for env_var in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        os.environ[env_var] = "1"
+
+    os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+
 import torch
 from transformers import pipeline
 try:
@@ -29,6 +48,48 @@ except ImportError:
 # Import our OOP base classes and decorators
 from oop_examples.base_classes import MultiInheritanceModelWrapper
 from oop_examples.decorators import timeit, log_exceptions, retry_on_failure
+
+logger = logging.getLogger(__name__)
+
+# Apply the same safeguard once torch is loaded; some builds ignore the env vars.
+if platform.system() == "Darwin":
+    try:
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+    except Exception:
+        # Fall back silently if the runtime does not support these controls
+        pass
+
+
+def _select_torch_device() -> torch.device:
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
+
+    logger.info(
+        "Torch device selected: %s | cuda_available=%s | mps_available=%s",
+        device,
+        torch.cuda.is_available(),
+        getattr(torch.backends, "mps", None) and torch.backends.mps.is_available(),
+    )
+    return device
+
+
+TORCH_DEVICE = _select_torch_device()
+
+
+def _pipeline_device_argument():
+    if TORCH_DEVICE.type == "cuda":
+        return 0
+    if TORCH_DEVICE.type == "mps":
+        return TORCH_DEVICE
+    return -1
+
+
+PIPELINE_DEVICE = _pipeline_device_argument()
 
 
 
@@ -52,6 +113,7 @@ class SentimentClassifierWrapper(MultiInheritanceModelWrapper):
         
         # Initialize model components
         self._pipeline = None
+        self._device = TORCH_DEVICE
         
         # Load model
         self._initialize_model()
@@ -63,11 +125,14 @@ class SentimentClassifierWrapper(MultiInheritanceModelWrapper):
         This demonstrates encapsulation - hiding complex initialization logic.
         """
         try:
-            # Use pipeline for sentiment analysis
+            logger.info(
+                "Initializing sentiment pipeline | model=%s | device=%s", self.model_name, self._device
+            )
+
             self._pipeline = pipeline(
                 "sentiment-analysis",
                 model=self.model_name,
-                device=0 if torch.cuda.is_available() else -1
+                device=PIPELINE_DEVICE
             )
             
             self._is_loaded = True
@@ -103,8 +168,10 @@ class SentimentClassifierWrapper(MultiInheritanceModelWrapper):
             raise RuntimeError("Model not loaded. Call _initialize_model() first.")
         
         try:
-            # Run sentiment analysis
-            results = self._pipeline(input_data)
+            logger.debug("Running sentiment inference | chars=%s", len(input_data))
+
+            with torch.inference_mode():
+                results = self._pipeline(input_data)
             
             # Handle both single result and list of results
             if isinstance(results, list):
@@ -186,6 +253,7 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
         self._processor = None
         self._model = None
         self._pipeline = None
+        self._device = TORCH_DEVICE
         
         # Load model asynchronously to avoid blocking UI
         self._initialize_model()
@@ -197,10 +265,16 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
         This demonstrates encapsulation - hiding complex initialization logic.
         """
         try:
-            # Use pipeline for simplicity and reliability
+            logger.info(
+                "Initializing image-classification pipeline | model=%s | device=%s",
+                self.model_name,
+                self._device,
+            )
+
             self._pipeline = pipeline(
                 "image-classification",
-                model=self.model_name
+                model=self.model_name,
+                device=PIPELINE_DEVICE
             )
             
             self._is_loaded = True
@@ -246,8 +320,14 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
             else:
                 raise TypeError("Input must be image path (str) or PIL Image")
             
-            # Run inference - get top 5 predictions
-            predictions = self._pipeline(image, top_k=5)
+            logger.debug(
+                "Running image classification | image_mode=%s | size=%s",
+                getattr(image, "mode", "unknown"),
+                getattr(image, "size", "unknown"),
+            )
+
+            with torch.inference_mode():
+                predictions = self._pipeline(image, top_k=5)
             
             # Format results for consistent output
             formatted_results = {
@@ -344,6 +424,7 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
         # Initialize model components
         self._pipeline = None
         self._tokenizer = None
+        self._device = TORCH_DEVICE
         
         # Load model
         self._initialize_model()
@@ -356,11 +437,17 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
         """
         try:
             # Use pipeline for text generation
+            logger.info(
+                "Initializing text-generation pipeline | model=%s | device=%s",
+                self.model_name,
+                self._device,
+            )
+
             self._pipeline = pipeline(
                 "text-generation",
                 model=self.model_name,
                 tokenizer=self.model_name,
-                device=0 if torch.cuda.is_available() else -1,
+                device=PIPELINE_DEVICE,
                 pad_token_id=50256  # GPT-2 specific pad token
             )
             
@@ -405,14 +492,22 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
         
         try:
             # Generate text with specified parameters
-            results = self._pipeline(
-                input_data,
-                max_length=len(input_data.split()) + max_len,
-                temperature=temp,
-                num_return_sequences=self._num_return_sequences,
-                do_sample=True,
-                pad_token_id=self._pipeline.tokenizer.eos_token_id
+            logger.debug(
+                "Running text generation | prompt_len=%s | max_len=%s | temperature=%s",
+                len(input_data),
+                max_len,
+                temp,
             )
+
+            with torch.inference_mode():
+                results = self._pipeline(
+                    input_data,
+                    max_length=len(input_data.split()) + max_len,
+                    temperature=temp,
+                    num_return_sequences=self._num_return_sequences,
+                    do_sample=True,
+                    pad_token_id=self._pipeline.tokenizer.eos_token_id
+                )
             
             # Format results
             formatted_results = {
@@ -513,6 +608,7 @@ class SpeechToTextWrapper(MultiInheritanceModelWrapper):
         
         # Initialize model components
         self._pipeline = None
+        self._device = TORCH_DEVICE
         
         # Load model
         self._initialize_model()
@@ -527,11 +623,16 @@ class SpeechToTextWrapper(MultiInheritanceModelWrapper):
             if not AUDIO_AVAILABLE:
                 raise ImportError("Audio processing libraries not available. Install librosa and soundfile.")
             
-            # Use pipeline for automatic speech recognition
+            logger.info(
+                "Initializing speech-to-text pipeline | model=%s | device=%s",
+                self.model_name,
+                self._device,
+            )
+
             self._pipeline = pipeline(
                 "automatic-speech-recognition",
                 model=self.model_name,
-                device=0 if torch.cuda.is_available() else -1
+                device=PIPELINE_DEVICE
             )
             
             self._is_loaded = True
@@ -575,7 +676,14 @@ class SpeechToTextWrapper(MultiInheritanceModelWrapper):
             
             # Run speech recognition with raw audio array
             # Enable timestamps for long audio files (>30 seconds)
-            result = self._pipeline(audio, return_timestamps=True)
+            logger.debug(
+                "Running speech-to-text | samples=%s | sample_rate=%s",
+                len(audio),
+                sample_rate,
+            )
+
+            with torch.inference_mode():
+                result = self._pipeline(audio, return_timestamps=True)
             
             # Get file information
             file_size = os.path.getsize(input_data) if os.path.exists(input_data) else 0
@@ -663,6 +771,7 @@ class TextToImageWrapper(MultiInheritanceModelWrapper):
         
         # Initialize model components
         self._pipeline = None
+        self._device = TORCH_DEVICE
         
         # Load model
         self._initialize_model()
@@ -681,17 +790,23 @@ class TextToImageWrapper(MultiInheritanceModelWrapper):
             from diffusers import StableDiffusionPipeline
             
             # Use lower precision for faster loading and less memory usage
+            logger.info(
+                "Initializing text-to-image pipeline | model=%s | device=%s",
+                self.model_name,
+                self._device,
+            )
+
+            dtype = torch.float16 if TORCH_DEVICE.type in {"cuda", "mps"} else torch.float32
+
             self._pipeline = StableDiffusionPipeline.from_pretrained(
                 self.model_name,
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+                torch_dtype=dtype,
                 use_safetensors=True
             )
             
-            # Move to appropriate device
-            if torch.cuda.is_available():
-                self._pipeline = self._pipeline.to("cuda")
+            if TORCH_DEVICE.type in {"cuda", "mps"}:
+                self._pipeline = self._pipeline.to(TORCH_DEVICE)
             else:
-                # Enable memory efficient attention for CPU
                 self._pipeline.enable_attention_slicing()
             
             self._is_loaded = True
@@ -732,14 +847,21 @@ class TextToImageWrapper(MultiInheritanceModelWrapper):
             num_images = max(1, min(num_images, 2))
             
             # Generate image(s)
-            result = self._pipeline(
-                input_data,
-                num_images_per_prompt=num_images,
-                num_inference_steps=self._num_inference_steps,
-                guidance_scale=self._guidance_scale,
-                height=self._image_size,
-                width=self._image_size
+            logger.debug(
+                "Running text-to-image | prompt_len=%s | num_images=%s",
+                len(input_data),
+                num_images,
             )
+
+            with torch.inference_mode():
+                result = self._pipeline(
+                    input_data,
+                    num_images_per_prompt=num_images,
+                    num_inference_steps=self._num_inference_steps,
+                    guidance_scale=self._guidance_scale,
+                    height=self._image_size,
+                    width=self._image_size
+                )
             
             # Save images to temporary files and collect paths
             import tempfile
