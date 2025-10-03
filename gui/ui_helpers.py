@@ -423,11 +423,7 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
         # Complex Hugging Face setup hidden here
         pass
 
-<<<<<<< HEAD
  WHY IT'S USEFUL:
-=======
-WHY IT'S USEFUL:
->>>>>>> 74ce47def5be02872ac62525cc6382715ec5f421
 • Hides complex Hugging Face pipeline setup from users
 • Protects internal state with private attributes
 • Provides simple public interface (run, validate_input, etc.)
