@@ -65,7 +65,7 @@ class OutputDisplay(ttk.Frame):
         
         empty_label = ttk.Label(
             self.content_frame,
-            text="🤖 Ready for AI Magic!\n\n"
+            text=" Ready for AI Magic!\n\n"
                  "Select your input type, provide data, choose a model,\n"
                  "and click 'Run Model' to see results here.\n\n"
                  "Results will be displayed in an easy-to-read format\n"
@@ -386,9 +386,9 @@ Each concept is implemented across multiple files with real-world applications.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-1️⃣ MULTIPLE INHERITANCE
-📍 Location: oop_examples/base_classes.py (Lines 185-220)
-📍 Implementation: MultiInheritanceModelWrapper class
+1.MULTIPLE INHERITANCE
+    Location: oop_examples/base_classes.py (Lines 185-220)
+    Implementation: MultiInheritanceModelWrapper class
 
 class MultiInheritanceModelWrapper(BaseModelWrapper, ModelLoggingMixin, ModelMetadataMixin):
     def __init__(self, model_name: str):
@@ -397,7 +397,7 @@ class MultiInheritanceModelWrapper(BaseModelWrapper, ModelLoggingMixin, ModelMet
         ModelLoggingMixin.__init__(self)
         ModelMetadataMixin.__init__(self)
 
-💡 WHY IT'S USEFUL:
+WHY IT'S USEFUL:
 • Combines base model functionality with logging and metadata capabilities
 • Demonstrates proper constructor chaining in multiple inheritance
 • Solves the "diamond problem" through careful design
@@ -405,9 +405,9 @@ class MultiInheritanceModelWrapper(BaseModelWrapper, ModelLoggingMixin, ModelMet
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-2️⃣ ENCAPSULATION
-📍 Location: models/hf_integration.py (Lines 50-120)
-📍 Implementation: ImageClassifierWrapper and TextGeneratorWrapper classes
+2. ENCAPSULATION
+    Location: models/hf_integration.py (Lines 50-120)
+    Implementation: ImageClassifierWrapper and TextGeneratorWrapper classes
 
 class ImageClassifierWrapper(MultiInheritanceModelWrapper):
     def __init__(self, model_name: str = "google/vit-base-patch16-224"):
@@ -423,7 +423,7 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
         # Complex Hugging Face setup hidden here
         pass
 
-💡 WHY IT'S USEFUL:
+WHY IT'S USEFUL:
 • Hides complex Hugging Face pipeline setup from users
 • Protects internal state with private attributes
 • Provides simple public interface (run, validate_input, etc.)
@@ -431,9 +431,9 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-3️⃣ POLYMORPHISM
-📍 Location: models/model_factory.py (Lines 150-180)
-📍 Implementation: All model wrappers implement BaseModelInterface
+3. POLYMORPHISM
+    Location: models/model_factory.py (Lines 150-180)
+    Implementation: All model wrappers implement BaseModelInterface
 
 # All models can be used the same way regardless of type:
 def process_with_any_model(model: BaseModelInterface, data: Any):
@@ -446,7 +446,7 @@ text_model = TextGeneratorWrapper("gpt2-model")
 result1 = process_with_any_model(image_model, "cat.jpg")     # Image processing
 result2 = process_with_any_model(text_model, "Hello world")  # Text processing
 
-💡 WHY IT'S USEFUL:
+WHY IT'S USEFUL:
 • Same interface works with different model types
 • Easy to add new model types without changing existing code
 • GUI can handle any model type uniformly
@@ -454,9 +454,9 @@ result2 = process_with_any_model(text_model, "Hello world")  # Text processing
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-4️⃣ METHOD OVERRIDING
-📍 Location: models/hf_integration.py (Lines 160-200, 280-320)
-📍 Implementation: Different validation methods for different model types
+4. METHOD OVERRIDING
+    Location: models/hf_integration.py (Lines 160-200, 280-320)
+    Implementation: Different validation methods for different model types
 
 class ImageClassifierWrapper(MultiInheritanceModelWrapper):
     def validate_input(self, input_data: Any) -> bool:
@@ -475,7 +475,7 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
         # Check length constraints
         return 0 < len(input_data.strip()) <= 1000
 
-💡 WHY IT'S USEFUL:
+WHY IT'S USEFUL:
 • Each model type has specialized validation logic
 • Maintains the same interface while providing specific behavior
 • Parent class defines the contract, children implement details
@@ -483,9 +483,9 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-5️⃣ MULTIPLE DECORATORS
-📍 Location: oop_examples/decorators.py (Lines 30-90)
-📍 Implementation: Stacked decorators on model methods
+5. MULTIPLE DECORATORS
+    Location: oop_examples/decorators.py (Lines 30-90)
+    Implementation: Stacked decorators on model methods
 
 @timeit                    # Measures execution time
 @log_exceptions           # Logs any errors that occur
@@ -498,7 +498,7 @@ def run(self, input_data: Any) -> Dict[str, Any]:
     # 3. Measure how long it takes (timeit)
     return self._process_input(input_data)
 
-💡 WHY IT'S USEFUL:
+WHY IT'S USEFUL:
 • Separates cross-cutting concerns (timing, logging, retry logic)
 • Decorators can be reused on multiple methods
 • Clean separation of business logic from infrastructure code
@@ -506,29 +506,29 @@ def run(self, input_data: Any) -> Dict[str, Any]:
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-🎯 DESIGN PATTERNS DEMONSTRATED:
+DESIGN PATTERNS DEMONSTRATED:
 
-🏭 FACTORY PATTERN (models/model_factory.py):
+FACTORY PATTERN (models/model_factory.py):
    Creates appropriate model instances without specifying exact classes
 
-🔍 OBSERVER PATTERN (gui/app_window.py):
+OBSERVER PATTERN (gui/app_window.py):
    UI components respond to input and model changes
 
-🎨 TEMPLATE METHOD PATTERN (oop_examples/base_classes.py):
+TEMPLATE METHOD PATTERN (oop_examples/base_classes.py):
    Base classes define algorithm structure, subclasses fill in details
 
-📋 STRATEGY PATTERN (models/hf_integration.py):
+STRATEGY PATTERN (models/hf_integration.py):
    Different model implementations can be swapped interchangeably
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-🚀 EDUCATIONAL TAKEAWAYS:
+EDUCATIONAL TAKEAWAYS:
 
-✅ Multiple inheritance can be powerful when used carefully
-✅ Encapsulation hides complexity and protects internal state
-✅ Polymorphism enables flexible, extensible code architectures
-✅ Method overriding allows specialization while maintaining contracts
-✅ Decorators provide clean separation of concerns
+Multiple inheritance can be powerful when used carefully
+Encapsulation hides complexity and protects internal state
+Polymorphism enables flexible, extensible code architectures
+Method overriding allows specialization while maintaining contracts
+Decorators provide clean separation of concerns
 
 This application demonstrates how these concepts work together to create
 maintainable, extensible software that can grow and adapt over time.

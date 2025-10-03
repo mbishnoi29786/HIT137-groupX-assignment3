@@ -383,7 +383,7 @@ def run_all_tests():
 def generate_test_report():
     """Generate a comprehensive test report."""
     print("=" * 70)
-    print("🧪 HIT137 ASSIGNMENT 3 - COMPREHENSIVE TEST REPORT")
+    print(" HIT137 ASSIGNMENT 3 - COMPREHENSIVE TEST REPORT")
     print("=" * 70)
     print()
     
@@ -391,7 +391,7 @@ def generate_test_report():
     result = run_all_tests()
     
     print("\n" + "=" * 70)
-    print("📊 TEST SUMMARY")
+    print(" TEST SUMMARY")
     print("=" * 70)
     print(f"Tests Run: {result.testsRun}")
     print(f"Failures: {len(result.failures)}")
@@ -399,25 +399,25 @@ def generate_test_report():
     print(f"Success Rate: {((result.testsRun - len(result.failures) - len(result.errors)) / result.testsRun * 100):.1f}%")
     
     if result.failures:
-        print("\n❌ FAILURES:")
+        print("\n FAILURES:")
         for test, traceback in result.failures:
             print(f"  • {test}: {traceback.split('AssertionError: ')[-1].split('\n')[0]}")
     
     if result.errors:
-        print("\n🔥 ERRORS:")
+        print("\n ERRORS:")
         for test, traceback in result.errors:
             print(f"  • {test}: {traceback.split('Exception: ')[-1].split('\n')[0]}")
     
     if not result.failures and not result.errors:
-        print("\n✅ ALL TESTS PASSED! 🎉")
-        print("\nThe application demonstrates:")
-        print("  ✓ Multiple Inheritance with proper constructor chaining")
-        print("  ✓ Encapsulation with private methods and data hiding")
-        print("  ✓ Polymorphism with unified interfaces")
-        print("  ✓ Method Overriding with specialized implementations")
-        print("  ✓ Multiple Decorators with stacked functionality")
-        print("  ✓ Comprehensive error handling and validation")
-        print("  ✓ Professional code organization and testing")
+        print("\n ALL TESTS PASSED! ")
+        print("\n The application demonstrates:")
+        print("  Sucess: Multiple Inheritance with proper constructor chaining")
+        print("  Sucess: Encapsulation with private methods and data hiding")
+        print("  Sucess: Polymorphism with unified interfaces")
+        print("  Sucess: Method Overriding with specialized implementations")
+        print("  Sucess: Multiple Decorators with stacked functionality")
+        print("  Sucess: Comprehensive error handling and validation")
+        print("  Sucess: Professional code organization and testing")
     
     print("\n" + "=" * 70)
     return result.wasSuccessful()

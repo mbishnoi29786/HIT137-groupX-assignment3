@@ -11,7 +11,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import threading
 import queue
-import json
 from typing import Dict, Any, Optional
 from datetime import datetime
 
@@ -61,6 +60,7 @@ class AIModelApp:
         self.root.title("HIT137 Assignment 3 - AI Model Integration Application")
         self.root.geometry("1200x800")
         self.root.minsize(800, 600)
+        self.root.protocol("WM_DELETE_WINDOW", self._on_exit)
         
         # Configure styles
         style = ttk.Style()
@@ -148,7 +148,7 @@ class AIModelApp:
         
         # Output tab
         output_frame = ttk.Frame(self.notebook)
-        self.notebook.add(output_frame, text="📊 Results")
+        self.notebook.add(output_frame, text="Results")
         
         self.output_display = OutputDisplay(output_frame)
         self.output_display.pack(fill='both', expand=True)
@@ -186,27 +186,27 @@ class AIModelApp:
         info_text.pack(fill='both', expand=True, padx=5, pady=5)
         
         # Initial content
-        initial_content = """🤖 AI Model Integration Application - Model Information
+        initial_content = """AI Model Integration Application - Model Information
 
 This application demonstrates advanced Object-Oriented Programming concepts through the integration of Hugging Face AI models.
 
-📋 Available Models:
+Available Models:
 
-1️⃣ Image Classification Model
+1. Image Classification Model
    • Model: google/vit-base-patch16-224 (Vision Transformer)
    • Task: Classify images into 1000+ ImageNet categories
    • Input: JPG, PNG, BMP, TIFF image files
    • Output: Top 5 predictions with confidence scores
    • Use Case: Object recognition, scene classification
 
-2️⃣ Text Generation Model
+2. Text Generation Model
    • Model: distilgpt2 (Distilled GPT-2)
    • Task: Generate creative text continuations
    • Input: Text prompts (any length)
    • Output: AI-generated text based on prompt
    • Use Case: Creative writing, text completion
 
-🏗️ OOP Concepts Demonstrated:
+OOP Concepts Demonstrated:
 
 ✓ Multiple Inheritance: ModelWrapper classes inherit from base classes and mixins
 ✓ Encapsulation: Complex model operations hidden behind simple interfaces
@@ -214,7 +214,7 @@ This application demonstrates advanced Object-Oriented Programming concepts thro
 ✓ Method Overriding: Subclasses customize parent behavior for specific needs
 ✓ Multiple Decorators: @timeit, @log_exceptions, @retry_on_failure applied together
 
-🔧 Technical Architecture:
+Technical Architecture:
 
 • Factory Pattern: ModelFactory creates appropriate model instances
 • Observer Pattern: UI components respond to model and input changes
@@ -222,13 +222,13 @@ This application demonstrates advanced Object-Oriented Programming concepts thro
 • Error Handling: Comprehensive exception handling with user feedback
 • Logging: Detailed operation logging for debugging and monitoring
 
-📚 Educational Value:
+Educational Value:
 
 This application serves as a comprehensive example of how advanced OOP principles
 can be applied to create maintainable, extensible AI applications. Each component
 demonstrates specific design patterns and programming best practices.
 
-🚀 Getting Started:
+Getting Started:
 
 1. Select your input type (Text or Image)
 2. Provide the appropriate input data
@@ -305,31 +305,31 @@ demonstrates specific design patterns and programming best practices.
             model_info = MODELS_CONFIG.get(model_key, {})
             usage_guide = USAGE_GUIDES.get(model_key, {})
             
-            detailed_info = f"""🤖 Current Model: {model_info.get('display_name', 'Unknown')}
+            detailed_info = f"""Current Model: {model_info.get('display_name', 'Unknown')}
 
-📊 Model Specifications:
+Model Specifications:
 • Name: {model_info.get('model_name', 'Unknown')}
 • Task: {model_info.get('task', 'unknown').replace('-', ' ').title()}
 • Size: {model_info.get('model_size', 'Unknown')}
 • Author: {model_info.get('author', 'Unknown')}
 • License: {model_info.get('license', 'Unknown')}
 
-📝 Description:
+Description:
 {model_info.get('description', 'No description available')}
 
-💡 Usage Tips:
+Usage Tips:
 {chr(10).join(f"• {tip}" for tip in usage_guide.get('preparation_tips', []))}
 
-📖 Interpreting Results:
+Interpreting Results:
 {chr(10).join(f"• {guide}" for guide in usage_guide.get('interpretation_guide', []))}
 
-⚠️ Limitations:
+Limitations:
 {chr(10).join(f"• {limit}" for limit in usage_guide.get('limitations', []))}
 
-🔗 More Information:
+More Information:
 {model_info.get('huggingface_url', 'Not available')}
 
-📦 Requirements:
+Requirements:
 {', '.join(model_info.get('requirements', ['None']))}
 """
             
@@ -437,6 +437,29 @@ demonstrates specific design patterns and programming best practices.
         """Update the status bar."""
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.status_bar.config(text=f"[{timestamp}] {message}")
+        
+    def _on_exit(self):
+        """Handle graceful application exit."""
+        if self.is_processing:
+            if not messagebox.askyesno(
+                "Confirm Exit",
+                "A model is still processing.\nAre you sure you want to exit?"
+            ):
+                return
+
+        if messagebox.askokcancel("Exit Application", "Do you really want to exit?"):
+            # Stop background processing
+            self.is_processing = False
+
+            # Clear queues safely
+            with self.processing_queue.mutex:
+                self.processing_queue.queue.clear()
+            with self.result_queue.mutex:
+                self.result_queue.queue.clear()
+
+            # Destroy the window gracefully
+            self.root.destroy()
+
 
 
 # Example usage for testing
@@ -444,3 +467,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = AIModelApp(root)
     root.mainloop()
+    

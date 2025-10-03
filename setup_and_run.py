@@ -128,7 +128,7 @@ def check_dependencies():
 
 def install_dependencies():
     """Install required dependencies."""
-    print("\n🔧 Installing dependencies...")
+    print("\n Installing dependencies...")
     print("   This may take several minutes for first-time installation...")
     
     try:
@@ -139,17 +139,17 @@ def install_dependencies():
         ], capture_output=True, text=True, timeout=60)
         
         # Install from requirements.txt with verbose output
-        print("   📦 Installing AI model dependencies...")
+        print("Installing AI model dependencies...")
         result = subprocess.run([
             sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt', '--upgrade'
         ], capture_output=False, text=True, timeout=600)  # 10 minutes timeout
         
         if result.returncode == 0:
-            print("\n✅ Dependencies installed successfully")
-            print("   🎯 All AI models and audio processing ready!")
+            print("\n Dependencies installed successfully")
+            print(" All AI models and audio processing ready!")
             return True
         else:
-            print(f"\n❌ Installation failed with return code: {result.returncode}")
+            print(f"\n Installation failed with return code: {result.returncode}")
             return False
             
     except subprocess.TimeoutExpired:
@@ -176,24 +176,24 @@ def run_tests():
         success = generate_test_report()
         
         if success:
-            print("\n✅ All tests passed! Application is ready to run.")
+            print("\n All tests passed! Application is ready to run.")
             return True
         else:
-            print("\n❌ Some tests failed. Please check the output above.")
+            print("\n Some tests failed. Please check the output above.")
             return False
             
     except ImportError as e:
-        print(f"❌ Could not import test modules: {e}")
+        print(f" Could not import test modules: {e}")
         print("   This might be due to missing dependencies.")
         return False
     except Exception as e:
-        print(f"❌ Test execution error: {e}")
+        print(f" Test execution error: {e}")
         return False
 
 
 def launch_application():
     """Launch the main application."""
-    print("\n🚀 Launching AI Model Integration Application...")
+    print("\n Launching AI Model Integration Application...")
     
     try:
         # Import and run the main application
@@ -206,10 +206,10 @@ def launch_application():
         main()
         
     except ImportError as e:
-        print(f"❌ Could not import main application: {e}")
+        print(f" Could not import main application: {e}")
         return False
     except Exception as e:
-        print(f"❌ Application launch error: {e}")
+        print(f" Application launch error: {e}")
         return False
     
     return True
@@ -218,17 +218,17 @@ def launch_application():
 def print_project_info():
     """Print project information and structure."""
     print("=" * 70)
-    print("🎓 HIT137 ASSIGNMENT 3 - AI MODEL INTEGRATION APPLICATION")
+    print(" HIT137 ASSIGNMENT 3 - AI MODEL INTEGRATION APPLICATION")
     print("=" * 70)
     print()
-    print("📋 Project Overview:")
+    print(" Project Overview:")
     print("   • Demonstrates advanced OOP concepts with AI model integration")
     print("   • 4 AI model types: text, image, audio, and text-to-image")
     print("   • Professional Tkinter GUI with intelligent model filtering")
     print("   • Audio playback, speech-to-text (no ffmpeg required)")
     print("   • Scrollable UI, export functionality, comprehensive testing")
     print()
-    print("🏗️ OOP Concepts Demonstrated:")
+    print(" OOP Concepts Demonstrated:")
     print("   ✓ Multiple Inheritance")
     print("   ✓ Encapsulation")
     print("   ✓ Polymorphism")
@@ -237,13 +237,13 @@ def print_project_info():
     print("   ✓ Factory Pattern")
     print("   ✓ Observer Pattern")
     print()
-    print("🤖 AI Models Integrated:")
+    print(" AI Models Integrated:")
     print("   • Sentiment Analysis: DistilBERT (distilbert-base-uncased-finetuned-sst-2-english)")
     print("   • Image Classification: Vision Transformer (google/vit-base-patch16-224)")
     print("   • Speech-to-Text: Whisper Tiny (openai/whisper-tiny)")
     print("   • Text-to-Image: Stable Diffusion 2.0 (stabilityai/stable-diffusion-2)")
     print()
-    print("🎨 Key Features:")
+    print(" Key Features:")
     print("   ✓ Intelligent model filtering based on input type")
     print("   ✓ Audio playback with play/stop controls")
     print("   ✓ Speech-to-text without ffmpeg dependency")
@@ -253,7 +253,7 @@ def print_project_info():
     print("   ✓ 10x10 pixel image previews")
     print("   ✓ Threaded processing with progress indicators")
     print()
-    print("📁 Project Structure:")
+    print(" Project Structure:")
     
     structure = """   HIT137-Assignment3/
    ├── main.py                      # Application entry point
@@ -319,7 +319,7 @@ def main():
     
     # Check system requirements
     if not check_system_requirements():
-        print("\n⚠️  System requirements not met. Continue at your own risk.")
+        print("\n  System requirements not met. Continue at your own risk.")
         response = input("Continue anyway? (y/N): ")
         if response.lower() != 'y':
             sys.exit(1)
@@ -329,17 +329,17 @@ def main():
         missing_deps = check_dependencies()
         
         if missing_deps:
-            print(f"\n⚠️  Missing dependencies: {', '.join(missing_deps)}")
+            print(f"\n  Missing dependencies: {', '.join(missing_deps)}")
             if not install_dependencies():
-                print("\n❌ Setup failed. Please install dependencies manually:")
+                print("\n Setup failed. Please install dependencies manually:")
                 print("   pip install -r requirements.txt")
                 sys.exit(1)
         else:
-            print("\n✅ All dependencies are available")
+            print("\n All dependencies are available")
     
     # Run tests
     if not run_tests():
-        print("\n⚠️  Some tests failed, but you can still try running the application.")
+        print("\n Some tests failed, but you can still try running the application.")
         
         response = input("\nDo you want to continue anyway? (y/N): ")
         if response.lower() != 'y':
@@ -353,17 +353,17 @@ def main():
         if success:
             print("\n🎉 Thank you for using the AI Model Integration Application!")
         else:
-            print("\n❌ Application failed to launch. Please check the error messages above.")
+            print("\n Application failed to launch. Please check the error messages above.")
             sys.exit(1)
     else:
-        print("\n✅ Test-only mode completed.")
+        print("\n Test-only mode completed.")
 
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\n🛑 Setup interrupted by user.")
+        print("\n\n Setup interrupted by user.")
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n Unexpected error: {e}")
         sys.exit(1)

@@ -13,7 +13,7 @@ from tkinter import font as tkFont
 from typing import Dict, Any, Callable, Optional, List
 from PIL import Image, ImageTk
 import os
-
+import threading
 
 class InputSelector(ttk.LabelFrame):
     """
@@ -239,6 +239,11 @@ class InputSelector(ttk.LabelFrame):
         )
         
         if filename:
+            if not os.path.exists(filename):
+                messagebox.showerror("File Error", "Selected file not found.")
+                return
+
+            
             self.image_path_var.set(filename)
             self.current_input_data = filename
             self._update_image_preview(filename)
@@ -264,6 +269,10 @@ class InputSelector(ttk.LabelFrame):
         )
         
         if filename:
+            if not os.path.exists(filename):
+                messagebox.showerror("File Error", "Selected file not found.")
+                return
+            
             self.audio_path_var.set(filename)
             self.current_input_data = filename
             self._update_audio_info(filename)
@@ -738,7 +747,22 @@ class ProcessingControls(ttk.Frame):
     def _on_run_click(self):
         """Handle run button click."""
         if self.on_run and not self.is_processing:
-            self.on_run()
+            # Set processing state immediately
+            self.set_processing_state(True, status_text="Processing...")
+            
+        # Run the on_run callback in a separate thread
+        threading.Thread(target=self._run_task_thread, daemon=True).start()
+    
+    def _run_task_thread(self):
+        """Wrapper to execute on_run and handle completion."""
+        try:
+            self.on_run()  # Run the long-running task
+        except Exception as e:
+            # Show error in status label
+            self.status_label.config(text=f"Error: {str(e)}")
+        finally:
+            # Restore UI after processing
+            self.set_processing_state(False)
     
     def _on_clear_click(self):
         """Handle clear button click."""
@@ -810,3 +834,4 @@ if __name__ == "__main__":
     # model_selector.pack(fill='both', expand=True, padx=10, pady=5)
     
     root.mainloop()
+    
