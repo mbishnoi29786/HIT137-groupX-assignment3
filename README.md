@@ -100,7 +100,9 @@ python main.py
 
 ## Team Members
 - Manish S393232
-- 
+- Oshan Thapa Chhetri S395087
+- Iresh Maharjan S396815
+- Karma Sonam Manandhar S396680
 
 ## Development Process
 This project follows best practices for collaborative development:
@@ -116,4 +118,4 @@ python -m pytest tests/
 ```
 
 ## License
-This project is for educational purposes as part of HIT137 coursework.
+This project is for educational purposes as part of HIT137 coursework by Sydney Group 24.
