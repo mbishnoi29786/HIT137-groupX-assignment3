@@ -31,6 +31,7 @@ def main():
         # Create the main application window
         root = tk.Tk()
         
+        
         # Initialize the application
         app = AIModelApp(root)
         

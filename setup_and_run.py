@@ -139,19 +139,18 @@ def install_dependencies():
         ], capture_output=True, text=True, timeout=60)
         
         # Install from requirements.txt with verbose output
-        print("Installing AI model dependencies...")
+        print("    Installing AI model dependencies...")
         result = subprocess.run([
             sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt', '--upgrade'
         ], capture_output=False, text=True, timeout=600)  # 10 minutes timeout
         
         if result.returncode == 0:
             print("\n Dependencies installed successfully")
-            print(" All AI models and audio processing ready!")
+            print("    All AI models and audio processing ready!")
             return True
         else:
             print(f"\n Installation failed with return code: {result.returncode}")
             return False
-            
     except subprocess.TimeoutExpired:
         print("\n Installation timed out (>10 minutes)")
         print("   Try installing manually: pip install -r requirements.txt")
@@ -199,7 +198,7 @@ def launch_application():
         # Import and run the main application
         from main import main
         
-        print("✅ Application started successfully!")
+        print(" Application started successfully!")
         print("   Use the GUI to interact with AI models.")
         print("   Close the window to exit.")
         
@@ -229,13 +228,13 @@ def print_project_info():
     print("   • Scrollable UI, export functionality, comprehensive testing")
     print()
     print(" OOP Concepts Demonstrated:")
-    print("   ✓ Multiple Inheritance")
-    print("   ✓ Encapsulation")
-    print("   ✓ Polymorphism")
-    print("   ✓ Method Overriding")
-    print("   ✓ Multiple Decorators")
-    print("   ✓ Factory Pattern")
-    print("   ✓ Observer Pattern")
+    print("   Sucess: Multiple Inheritance")
+    print("   Sucess: Encapsulation")
+    print("   Sucess: Polymorphism")
+    print("   Sucess: Method Overriding")
+    print("   Sucess: Multiple Decorators")
+    print("   Sucess: Factory Pattern")
+    print("   Sucess: Observer Pattern")
     print()
     print(" AI Models Integrated:")
     print("   • Sentiment Analysis: DistilBERT (distilbert-base-uncased-finetuned-sst-2-english)")
@@ -244,14 +243,14 @@ def print_project_info():
     print("   • Text-to-Image: Stable Diffusion 2.0 (stabilityai/stable-diffusion-2)")
     print()
     print(" Key Features:")
-    print("   ✓ Intelligent model filtering based on input type")
-    print("   ✓ Audio playback with play/stop controls")
-    print("   ✓ Speech-to-text without ffmpeg dependency")
-    print("   ✓ Export results functionality")
-    print("   ✓ Scrollable UI with fixed heights")
-    print("   ✓ Auto-clear results on new runs")
-    print("   ✓ 10x10 pixel image previews")
-    print("   ✓ Threaded processing with progress indicators")
+    print("   Sucess: Intelligent model filtering based on input type")
+    print("   Sucess: Audio playback with play/stop controls")
+    print("   Sucess: Speech-to-text without ffmpeg dependency")
+    print("   Sucess: Export results functionality")
+    print("   Sucess: Scrollable UI with fixed heights")
+    print("   Sucess: Auto-clear results on new runs")
+    print("   Sucess: 10x10 pixel image previews")
+    print("   Sucess: Threaded processing with progress indicators")
     print()
     print(" Project Structure:")
     
@@ -339,7 +338,7 @@ def main():
     
     # Run tests
     if not run_tests():
-        print("\n Some tests failed, but you can still try running the application.")
+        print("\n  Some tests failed, but you can still try running the application.")
         
         response = input("\nDo you want to continue anyway? (y/N): ")
         if response.lower() != 'y':
@@ -351,7 +350,7 @@ def main():
         success = launch_application()
         
         if success:
-            print("\n🎉 Thank you for using the AI Model Integration Application!")
+            print("\n Thank you for using the AI Model Integration Application!")
         else:
             print("\n Application failed to launch. Please check the error messages above.")
             sys.exit(1)

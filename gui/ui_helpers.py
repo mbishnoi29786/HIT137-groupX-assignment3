@@ -379,14 +379,14 @@ class OOPExplanationDisplay(ttk.Frame):
     
     def _load_explanations(self):
         """Load OOP concept explanations and examples."""
-        explanations = """🏗️ OBJECT-ORIENTED PROGRAMMING CONCEPTS IN THIS APPLICATION
+        explanations = """ OBJECT-ORIENTED PROGRAMMING CONCEPTS IN THIS APPLICATION
 
 This application demonstrates advanced OOP concepts through practical AI model integration.
 Each concept is implemented across multiple files with real-world applications.
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-1.MULTIPLE INHERITANCE
+1. MULTIPLE INHERITANCE
     Location: oop_examples/base_classes.py (Lines 185-220)
     Implementation: MultiInheritanceModelWrapper class
 
@@ -397,7 +397,7 @@ class MultiInheritanceModelWrapper(BaseModelWrapper, ModelLoggingMixin, ModelMet
         ModelLoggingMixin.__init__(self)
         ModelMetadataMixin.__init__(self)
 
-WHY IT'S USEFUL:
+ WHY IT'S USEFUL:
 • Combines base model functionality with logging and metadata capabilities
 • Demonstrates proper constructor chaining in multiple inheritance
 • Solves the "diamond problem" through careful design
@@ -423,7 +423,11 @@ class ImageClassifierWrapper(MultiInheritanceModelWrapper):
         # Complex Hugging Face setup hidden here
         pass
 
+<<<<<<< HEAD
+ WHY IT'S USEFUL:
+=======
 WHY IT'S USEFUL:
+>>>>>>> 74ce47def5be02872ac62525cc6382715ec5f421
 • Hides complex Hugging Face pipeline setup from users
 • Protects internal state with private attributes
 • Provides simple public interface (run, validate_input, etc.)
@@ -446,7 +450,7 @@ text_model = TextGeneratorWrapper("gpt2-model")
 result1 = process_with_any_model(image_model, "cat.jpg")     # Image processing
 result2 = process_with_any_model(text_model, "Hello world")  # Text processing
 
-WHY IT'S USEFUL:
+ WHY IT'S USEFUL:
 • Same interface works with different model types
 • Easy to add new model types without changing existing code
 • GUI can handle any model type uniformly
@@ -475,7 +479,7 @@ class TextGeneratorWrapper(MultiInheritanceModelWrapper):
         # Check length constraints
         return 0 < len(input_data.strip()) <= 1000
 
-WHY IT'S USEFUL:
+ WHY IT'S USEFUL:
 • Each model type has specialized validation logic
 • Maintains the same interface while providing specific behavior
 • Parent class defines the contract, children implement details
@@ -498,7 +502,7 @@ def run(self, input_data: Any) -> Dict[str, Any]:
     # 3. Measure how long it takes (timeit)
     return self._process_input(input_data)
 
-WHY IT'S USEFUL:
+ WHY IT'S USEFUL:
 • Separates cross-cutting concerns (timing, logging, retry logic)
 • Decorators can be reused on multiple methods
 • Clean separation of business logic from infrastructure code
@@ -506,29 +510,29 @@ WHY IT'S USEFUL:
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-DESIGN PATTERNS DEMONSTRATED:
+ DESIGN PATTERNS DEMONSTRATED:
 
-FACTORY PATTERN (models/model_factory.py):
+ FACTORY PATTERN (models/model_factory.py):
    Creates appropriate model instances without specifying exact classes
 
-OBSERVER PATTERN (gui/app_window.py):
+ OBSERVER PATTERN (gui/app_window.py):
    UI components respond to input and model changes
 
-TEMPLATE METHOD PATTERN (oop_examples/base_classes.py):
+ TEMPLATE METHOD PATTERN (oop_examples/base_classes.py):
    Base classes define algorithm structure, subclasses fill in details
 
-STRATEGY PATTERN (models/hf_integration.py):
+ STRATEGY PATTERN (models/hf_integration.py):
    Different model implementations can be swapped interchangeably
 
 ═══════════════════════════════════════════════════════════════════════════════
 
-EDUCATIONAL TAKEAWAYS:
+ EDUCATIONAL TAKEAWAYS:
 
-Multiple inheritance can be powerful when used carefully
-Encapsulation hides complexity and protects internal state
-Polymorphism enables flexible, extensible code architectures
-Method overriding allows specialization while maintaining contracts
-Decorators provide clean separation of concerns
+ Multiple inheritance can be powerful when used carefully
+ Encapsulation hides complexity and protects internal state
+ Polymorphism enables flexible, extensible code architectures
+ Method overriding allows specialization while maintaining contracts
+ Decorators provide clean separation of concerns
 
 This application demonstrates how these concepts work together to create
 maintainable, extensible software that can grow and adapt over time.

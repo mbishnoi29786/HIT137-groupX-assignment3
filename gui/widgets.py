@@ -780,7 +780,7 @@ class ProcessingControls(ttk.Frame):
         self.is_processing = is_processing
         
         if is_processing:
-            self.run_button.config(state='disabled', text="⏳ Processing...")
+            self.run_button.config(state='disabled', text=" Processing...")
             self.clear_button.config(state='disabled')
             self.status_label.pack_forget()
             self.progress_bar.pack(side='right', padx=(0, 5))
@@ -789,7 +789,7 @@ class ProcessingControls(ttk.Frame):
             if status_text:
                 self.status_label.config(text=status_text)
         else:
-            self.run_button.config(state='normal', text="▶ Run Model")
+            self.run_button.config(state='normal', text=" Run Model")
             self.clear_button.config(state='normal')
             self.progress_bar.stop()
             self.progress_bar.pack_forget()
