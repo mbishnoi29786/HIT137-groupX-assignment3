@@ -4,7 +4,7 @@ Main entry point for the HIT137 Assignment 3 AI Model Integration Application.
 This application demonstrates advanced OOP concepts while providing a user-friendly
 interface for interacting with Hugging Face AI models.
 
-Author: [Your Team Name]
+Author: SYDN 24
 Date: 2025
 Course: HIT137
 """
