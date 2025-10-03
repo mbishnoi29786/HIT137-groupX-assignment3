@@ -7,6 +7,7 @@ and demonstrates the complete integration of OOP concepts with AI model function
 Demonstrates: Application architecture, component integration, event handling
 """
 
+import logging
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import threading
@@ -37,6 +38,7 @@ class AIModelApp:
         self.model_factory = get_model_factory()
         self.current_model = None
         self.current_model_key = None
+        self.logger = logging.getLogger(self.__class__.__name__)
         
         # Threading components
         self.processing_queue = queue.Queue()
@@ -54,6 +56,7 @@ class AIModelApp:
         self._create_layout()
         self._initialize_models()
         self._start_result_monitor()
+        self.logger.info("AIModelApp initialized")
     
     def _setup_window(self):
         """Configure the main application window."""
@@ -173,6 +176,7 @@ class AIModelApp:
             relief='sunken'
         )
         self.status_bar.pack(side='bottom', fill='x')
+        self.logger.debug("Application layout created")
     
     def _create_model_info_tab(self, parent):
         """Create the model information tab content."""
@@ -222,7 +226,7 @@ This application demonstrates advanced Object-Oriented Programming concepts thro
 • Error Handling: Comprehensive exception handling with user feedback
 • Logging: Detailed operation logging for debugging and monitoring
 
- Educational Value:
+ Key Value:
 
 This application serves as a comprehensive example of how advanced OOP principles
 can be applied to create maintainable, extensible AI applications. Each component
@@ -250,8 +254,10 @@ demonstrates specific design patterns and programming best practices.
                 # Create default models to cache them
                 self.model_factory.create_all_default_models()
                 self._update_status("Models initialized successfully")
+                self.logger.info("Background model warm-up completed")
             except Exception as e:
                 self._update_status(f"Model initialization warning: {e}")
+                self.logger.exception("Background model initialization failed")
         
         # Run initialization in background thread
         init_thread = threading.Thread(target=init_models, daemon=True)
@@ -276,6 +282,7 @@ demonstrates specific design patterns and programming best practices.
     def _on_input_change(self, input_type: str, input_data: Any):
         """Handle input change events."""
         self._update_status(f"Input changed: {input_type}")
+        self.logger.info("Input changed | type=%s", input_type)
         
         # Filter models based on input type
         self.model_selector.filter_models_by_input_type(input_type)
@@ -286,6 +293,7 @@ demonstrates specific design patterns and programming best practices.
             self.current_model_key = new_model_key
             display_name = MODELS_CONFIG.get(new_model_key, {}).get('display_name', new_model_key)
             self._update_status(f"Auto-selected model: {display_name}")
+            self.logger.info("Auto-selected model | key=%s", new_model_key)
             
             # Update model info display
             self._update_model_info_display(new_model_key)
@@ -295,6 +303,7 @@ demonstrates specific design patterns and programming best practices.
         self.current_model_key = model_key
         display_name = MODELS_CONFIG.get(model_key, {}).get('display_name', model_key)
         self._update_status(f"Model selected: {display_name}")
+        self.logger.info("Model selected | key=%s", model_key)
         
         # Update model info display
         self._update_model_info_display(model_key)
@@ -358,16 +367,23 @@ Usage Tips:
                 "No Input",
                 "Please provide input data before running the model."
             )
+            self.logger.warning("Run aborted: missing input | input_type=%s", input_type)
             return
-        
+
         if not self.current_model_key:
             messagebox.showwarning(
                 "No Model Selected",
                 "Please select a model before processing."
             )
+            self.logger.warning("Run aborted: no model selected")
             return
-        
+
         # Start processing in background
+        self.logger.info(
+            "Launching inference | model_key=%s | input_type=%s",
+            self.current_model_key,
+            input_type,
+        )
         self._start_background_processing(input_type, input_data, self.current_model_key)
     
     def _start_background_processing(self, input_type: str, input_data: Any, model_key: str):
@@ -375,14 +391,19 @@ Usage Tips:
         self.is_processing = True
         self.processing_controls.set_processing_state(True, "Processing...")
         self._update_status("Running model inference...")
+        self.logger.debug(
+            "Inference worker starting | model_key=%s | input_type=%s", model_key, input_type
+        )
         
         def process_model():
             try:
                 # Create or get model instance
                 model = self.model_factory.create_model(model_key)
+                self.logger.debug("Model instance retrieved | key=%s", model_key)
                 
                 # Run inference
                 result = model.run(input_data)
+                self.logger.debug("Model run completed | key=%s", model_key)
                 
                 # Add metadata
                 result['processing_time'] = datetime.now().isoformat()
@@ -394,6 +415,7 @@ Usage Tips:
                 
             except Exception as e:
                 # Send error to main thread
+                self.logger.exception("Background inference error")
                 self.result_queue.put(('error', str(e)))
         
         # Start processing thread
@@ -411,6 +433,11 @@ Usage Tips:
             # Display results
             self.output_display.display_result(result_content)
             self._update_status("Processing completed successfully")
+            self.logger.info(
+                "Inference success | model=%s | keys=%s",
+                result_content.get('model_key'),
+                list(result_content.keys()),
+            )
             
             # Switch to results tab
             self.notebook.select(0)
@@ -419,6 +446,7 @@ Usage Tips:
             # Show error
             messagebox.showerror("Processing Error", f"Model processing failed:\n\n{result_content}")
             self._update_status(f"Processing failed: {result_content}")
+            self.logger.error("Inference failure | message=%s", result_content)
     
     def _on_clear_all(self):
         """Handle clear all button click."""
@@ -430,8 +458,9 @@ Usage Tips:
         
         # Clear output
         self.output_display.clear_display()
-        
+
         self._update_status("All data cleared")
+        self.logger.info("Cleared input and output panes")
     
     def _update_status(self, message: str):
         """Update the status bar."""
