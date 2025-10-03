@@ -99,7 +99,8 @@ python main.py
 - **Output**: Generated text continuations
 
 ## Team Members
-- [Add team member names and roles here]
+- Manish S393232
+- 
 
 ## Development Process
 This project follows best practices for collaborative development:
