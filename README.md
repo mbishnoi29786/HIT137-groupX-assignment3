@@ -1,121 +1,118 @@
-# HIT137 Group Assignment 3 - AI Model Integration Application
+# HIT137 Group Assignment 3 · AI Model Integration Platform
 
-## Project Overview
-This application demonstrates advanced Object-Oriented Programming concepts while integrating Hugging Face AI models through a user-friendly Tkinter GUI. The application supports multiple input types (text, image, audio) and showcases two different AI models for various tasks.
+## 1. Project Overview
+The application showcases how disciplined object-oriented design keeps an applied AI solution maintainable. A Tkinter desktop client orchestrates multiple Hugging Face models (sentiment analysis, image classification, speech-to-text, text-to-image) while demonstrating patterns such as factories, mixins, polymorphism, and threaded execution for a responsive user experience.
 
-## Features
-- **Multi-input Support**: Handle text, image, and audio inputs
-- **AI Model Integration**: Two Hugging Face models (Image Classification & Text Generation)
-- **Advanced OOP Concepts**: Multiple inheritance, polymorphism, encapsulation, decorators
-- **User-friendly GUI**: Intuitive Tkinter interface with tabbed output display
-- **Real-time Processing**: Threaded model execution to prevent UI freezing
+## 2. Key Capabilities
+- **Unified workspace** – switch between text, image, audio, and prompt-driven generation from a single control panel.
+- **Model catalogue** – view preparation tips, interpretation guidance, and operational constraints for each integrated model.
+- **Rich visual feedback** – result cards, sortable tables, and contextual annotations clarify what the models produced and why.
+- **Robust architecture** – separation between GUI, model factory, and Hugging Face wrappers keeps the codebase modular and testable.
 
-## Project Structure
+## 3. Architecture Snapshot
 ```
-HIT137-Assignment3/
-├── main.py                 # Application entry point
-├── requirements.txt        # Python dependencies
-├── README.md              # This file
-├── github_link.txt        # Repository URL
-├── gui/                   # GUI components
-│   ├── app_window.py      # Main application window
-│   ├── widgets.py         # Custom UI widgets
-│   └── ui_helpers.py      # UI utility functions
-├── models/                # AI model integration
-│   ├── hf_integration.py  # Hugging Face model wrappers
-│   ├── model_info.py      # Model metadata
-│   └── model_factory.py   # Model creation factory
-├── oop_examples/          # OOP demonstrations
-│   ├── base_classes.py    # Base classes and interfaces
-│   └── decorators.py      # Custom decorators
-└── tests/                 # Test files
-    └── simple_tests.py    # Unit tests
+HIT137-groupX-assignment3/
+├── main.py                     # Application entry point (logging + Tk bootstrap)
+├── gui/
+│   ├── app_window.py           # Main window + layout orchestration
+│   ├── widgets.py              # Input selector, model selector, control strip
+│   ├── ui_helpers.py           # Results renderer + OOP explainer
+│   └── theme.py                # Centralised visual styling
+├── models/
+│   ├── model_factory.py        # Factory pattern with caching
+│   ├── hf_integration.py       # Hugging Face wrapper classes
+│   └── model_info.py           # Metadata + usage guidance
+├── oop_examples/               # Reusable OOP demonstrations
+│   ├── base_classes.py         # Interfaces, mixins, multiple inheritance
+│   └── decorators.py           # Timing, logging, retry decorators
+├── tests/
+│   └── simple_tests.py         # Lightweight regression checks
+└── logging_config.py           # Structured logging configuration
 ```
 
-## OOP Concepts Demonstrated
+## 4. Technology Stack
+- **Python 3.10+**
+- **Tkinter / ttk themed widgets** for the desktop UI
+- **Hugging Face Transformers & Diffusers** for model execution
+- **PyTorch** backend with CPU/MPS fallbacks
+- **Pillow, librosa, soundfile** for media handling
 
-### 1. Multiple Inheritance
-- `LoggedModelWrapper` class inherits from both `ModelLoggingMixin` and `BaseModelWrapper`
-- Combines logging functionality with base model interface
+## 5. Object-Oriented Patterns in Focus
+| Pattern / Concept       | Implementation Highlights                                                |
+|-------------------------|----------------------------------------------------------------------------|
+| Multiple inheritance     | `MultiInheritanceModelWrapper` composes base behaviours and mixins        |
+| Encapsulation            | Private `_initialize_model` routines hide Hugging Face boilerplate        |
+| Polymorphism             | Every wrapper satisfies `BaseModelInterface.run()` for uniform control    |
+| Method overriding        | Input validation and `run()` signatures tailored per modality             |
+| Factory pattern          | `ModelFactory.create_model()` selects and caches wrappers seamlessly      |
+| Decorator stacking       | `@timeit`, `@log_exceptions`, `@retry_on_failure` enhance model methods   |
+| Event-driven updates     | GUI reacts to input/model changes to keep controls and notes in sync      |
 
-### 2. Encapsulation
-- Model wrappers hide complex Hugging Face pipeline internals
-- Private methods and properties protect internal state
+## 6. Refined User Experience
+- Light, professional theme with clear typography and contrast for inputs and text areas.
+- Accessible placeholders and status messaging to guide data entry.
+- Commentary panes summarise how to interpret results, when to be cautious, and what to revisit.
+- Model information auto-refreshes with team-oriented operational notes.
 
-### 3. Polymorphism
-- All model wrappers implement the same `run()` interface
-- GUI can call any model uniformly without knowing its type
+## 7. Getting Started
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/mbishnoi29786/HIT137-groupX-assignment3.git
+   cd HIT137-groupX-assignment3
+   ```
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Launch the application**
+   ```bash
+   python main.py
+   ```
 
-### 4. Method Overriding
-- Child classes override parent methods to provide specific implementations
-- Custom behavior while maintaining the same interface
+> **Note:** On macOS, the application constrains BLAS/OpenMP threading to avoid the Accelerate SIGBUS issue and will automatically fall back to CPU or MPS where appropriate.
 
-### 5. Multiple Decorators
-- `@timeit` and `@log_exceptions` decorators applied to multiple methods
-- Demonstrates decorator stacking and reusability
+## 8. Using the Application
+1. Choose an **input type** (text, image, audio, or prompt for generation).
+2. Provide the relevant **input data** (free-text, file chooser, etc.).
+3. Select a **model** from the filtered list.  The model information tab updates instantly.
+4. Press **Run Model** to execute inference; background threads keep the interface responsive.
+5. Review **Results**, inspect the **OOP Concepts** reference, or read the **Model Details** tab for context.
+6. Export structured output to JSON for downstream analysis if required.
 
-## Installation
+## 9. Integrated Models (Summary)
+| Model Key              | Hugging Face ID                                  | Primary Use Case                                  |
+|------------------------|--------------------------------------------------|---------------------------------------------------|
+| sentiment_classifier   | distilbert-base-uncased-finetuned-sst-2-english  | Rapid binary sentiment scoring                    |
+| image_classifier       | google/vit-base-patch16-224                      | General-purpose image categorisation              |
+| speech_to_text         | openai/whisper-tiny                              | Lightweight audio transcription                   |
+| text_to_image          | stabilityai/stable-diffusion-2                   | Concept art and visual ideation from text prompts |
 
-1. Clone the repository:
-```bash
-git clone https://github.com/mbishnoi29786/HIT137-groupX-assignment3.git
-cd HIT137-Assignment3
-```
+Each entry in the UI includes preparation checklists, interpretation guidance, operational constraints, external references, and dependency notes.
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## 10. Logging & Diagnostics
+Structured logging is initialised via `logging_config.py` before any module import:
+- Console stream at INFO for operator awareness
+- Rotating file handler (`app.log`) capturing DEBUG detail
+- Background inference threads log status transitions to support troubleshooting
 
-3. Run the application:
-```bash
-python main.py
-```
-
-## Usage
-
-1. **Select Input Type**: Choose between Text, Image, or Audio
-2. **Provide Input**: Enter text, select image file, or choose audio file
-3. **Select Model**: Choose from available AI models
-4. **Run Processing**: Click "Run" to process input with selected model
-5. **View Results**: Check output in the Results tab
-6. **Explore OOP**: Review OOP implementation details in the OOP Explanations tab
-7. **Model Info**: Learn about the AI models in the Model Info tab
-
-## AI Models Used
-
-### 1. Image Classification Model
-- **Model**: google/vit-base-patch16-224
-- **Task**: Image classification
-- **Description**: Classifies images into predefined categories
-- **Input**: Image files (JPG, PNG, etc.)
-- **Output**: Classification labels with confidence scores
-
-### 2. Text Generation Model
-- **Model**: distilgpt2
-- **Task**: Text generation
-- **Description**: Generates coherent text based on input prompts
-- **Input**: Text prompts
-- **Output**: Generated text continuations
-
-## Team Members
-- Manish S393232
-- Oshan Thapa Chhetri S395087
-- Iresh Maharjan S396815
-- Karma Sonam Manandhar S396680
-
-## Development Process
-This project follows best practices for collaborative development:
-- Feature branching with pull requests
-- Code reviews and testing
-- Clear commit messages and documentation
-- Modular design for maintainability
-
-## Testing
-Run the test suite:
+## 11. Testing
+Run the regression tests whenever dependencies or model wrappers change:
 ```bash
 python -m pytest tests/
 ```
+Additional unit or integration tests can be layered onto `tests/` as new features are introduced.
 
-## License
-This project is for educational purposes as part of HIT137 coursework by Sydney Group 24.
+## 12. Team Members
+- **Manish** · Student ID S393232
+- **Oshan Thapa Chhetri** · Student ID S395087
+- **Iresh Maharjan** · Student ID S396815
+- **Karma Sonam Manandhar** · Student ID S396680
+
+## 13. Contribution Workflow
+- Branch-per-feature with descriptive commit messages
+- Pull requests reviewed by peers before merging
+- Linting and targeted tests prior to submission
+- Documentation and UI copy kept in step with feature changes
+
+## 14. License & Academic Context
+This repository forms part of the HIT137 coursework (Sydney Group 24). The project is intended for educational use and demonstrates best practices for collaborative software delivery within an academic setting.
